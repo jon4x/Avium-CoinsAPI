@@ -1,6 +1,10 @@
 package de.lauxmedia.avium.coinsapi;
 
+import de.lauxmedia.avium.coinsapi.mysql.MySQL;
 import org.bukkit.plugin.java.JavaPlugin;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public final class CoinsAPI extends JavaPlugin {
 
@@ -39,6 +43,56 @@ public final class CoinsAPI extends JavaPlugin {
     public void loadConfig() {
         getConfig().options().copyDefaults(true);
         saveConfig();
+    }
+
+    // getCoins API function
+    private static int getCoins(String uuid) {
+        try {
+            PreparedStatement st = MySQL.connection.prepareStatement("SELECT * FROM coins WHERE uuid = ?");
+            st.setString(1, uuid);
+            ResultSet rs = st.executeQuery();
+            if (rs.next())
+                return rs.getInt("coins");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    // setCoins API function
+    private static void setCoins(String uuid, int coins) {
+        if (getCoins(uuid) == -1) {
+            try {
+                PreparedStatement st = MySQL.connection.prepareStatement("INSERT INTO coins (uuid,coins) VALUES (?, ?)");
+                st.setString(1, uuid);
+                st.setInt(2, coins);
+                st.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                PreparedStatement st = MySQL.connection.prepareStatement("UPDATE coins SET coins = ? WHERE uuid = ?");
+                st.setInt(1, coins);
+                st.setString(2, uuid);
+                st.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // addCoins API function
+    private static void addCoins(String uuid, int coins) {
+        if (getCoins(uuid) != -1) {
+            setCoins(uuid, getCoins(uuid) + coins);
+        } else {
+            setCoins(uuid, getCoins(uuid) + coins + 1);
+        }
+    }
+
+    private void removeCoins(String uuid, int coins) {
+        setCoins(uuid, getCoins(uuid) - coins);
     }
 
     public static CoinsAPI getInstance() {
