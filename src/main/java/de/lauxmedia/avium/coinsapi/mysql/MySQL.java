@@ -10,7 +10,7 @@ import org.bukkit.Bukkit;
 
 public class MySQL {
 
-    public static Connection connection;
+    private static Connection connection;
 
     public static void connect() {
         try {
@@ -20,7 +20,7 @@ public class MySQL {
 
             createTable();
             Bukkit.getConsoleSender().sendMessage("MySQL wurde erfolgreich verbunden!");
-            reconnector();
+            reConnector();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -48,13 +48,14 @@ public class MySQL {
         }
     }
 
-    public static void reconnector() {
+    public static void reConnector() {
         Bukkit.getScheduler().runTaskLaterAsynchronously(CoinsAPI.getInstance(), () -> {
             close();
             connect();
         }, 24000L);
+    }
 
-}
-
-
+    public static Connection getConnection() {
+        return connection;
+    }
 }

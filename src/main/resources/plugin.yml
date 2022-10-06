@@ -1,6 +1,6 @@
 name: CoinsAPI
 version: '${project.version}'
-main: de.lauxmedia.avium.coinsapi.coinsapi.CoinsAPI
+main: de.lauxmedia.avium.coinsapi.CoinsAPI
 api-version: 1.16
 load: STARTUP
 authors: [ jonax ]

@@ -26,11 +26,13 @@ public final class CoinsAPI extends JavaPlugin {
         loadConfig();
         // connect MySQL
         connectMySQL();
+        MySQL.connect();
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        MySQL.close();
     }
 
     private void connectMySQL() {
@@ -40,15 +42,15 @@ public final class CoinsAPI extends JavaPlugin {
         password = getConfig().getString("config.password");
     }
 
-    public void loadConfig() {
+    private void loadConfig() {
         getConfig().options().copyDefaults(true);
         saveConfig();
     }
 
     // getCoins API function
-    private static int getCoins(String uuid) {
+    public int getCoins(String uuid) {
         try {
-            PreparedStatement st = MySQL.connection.prepareStatement("SELECT * FROM coins WHERE uuid = ?");
+            PreparedStatement st = MySQL.getConnection().prepareStatement("SELECT * FROM coins WHERE uuid = ?");
             st.setString(1, uuid);
             ResultSet rs = st.executeQuery();
             if (rs.next())
@@ -60,10 +62,10 @@ public final class CoinsAPI extends JavaPlugin {
     }
 
     // setCoins API function
-    private static void setCoins(String uuid, int coins) {
+    public void setCoins(String uuid, int coins) {
         if (getCoins(uuid) == -1) {
             try {
-                PreparedStatement st = MySQL.connection.prepareStatement("INSERT INTO coins (uuid,coins) VALUES (?, ?)");
+                PreparedStatement st = MySQL.getConnection().prepareStatement("INSERT INTO coins (uuid,coins) VALUES (?, ?)");
                 st.setString(1, uuid);
                 st.setInt(2, coins);
                 st.executeUpdate();
@@ -72,7 +74,7 @@ public final class CoinsAPI extends JavaPlugin {
             }
         } else {
             try {
-                PreparedStatement st = MySQL.connection.prepareStatement("UPDATE coins SET coins = ? WHERE uuid = ?");
+                PreparedStatement st = MySQL.getConnection().prepareStatement("UPDATE coins SET coins = ? WHERE uuid = ?");
                 st.setInt(1, coins);
                 st.setString(2, uuid);
                 st.executeUpdate();
@@ -83,7 +85,7 @@ public final class CoinsAPI extends JavaPlugin {
     }
 
     // addCoins API function
-    private static void addCoins(String uuid, int coins) {
+    public void addCoins(String uuid, int coins) {
         if (getCoins(uuid) != -1) {
             setCoins(uuid, getCoins(uuid) + coins);
         } else {
@@ -91,7 +93,7 @@ public final class CoinsAPI extends JavaPlugin {
         }
     }
 
-    private void removeCoins(String uuid, int coins) {
+    public void removeCoins(String uuid, int coins) {
         setCoins(uuid, getCoins(uuid) - coins);
     }
 
