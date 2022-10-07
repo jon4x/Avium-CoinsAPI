@@ -30,7 +30,6 @@ public class MySQL {
         if (isConnected())
             try {
                 connection.close();
-                Bukkit.getConsoleSender().sendMessage("MySQL wurde erfolgreich getrennt!");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -40,7 +39,7 @@ public class MySQL {
         return (connection != null);
     }
 
-    public static void createTable() {
+    private static void createTable() {
         try {
             connection.prepareStatement("CREATE TABLE IF NOT EXISTS coins (uuid VARCHAR(100), coins INT(20))").executeUpdate();
         } catch (SQLException e) {
@@ -48,10 +47,11 @@ public class MySQL {
         }
     }
 
-    public static void reConnector() {
+    private static void reConnector() {
         Bukkit.getScheduler().runTaskLaterAsynchronously(CoinsAPI.getInstance(), () -> {
-            close();
-            connect();
+            if (!isConnected()) {
+                connect();
+            }
         }, 24000L);
     }
 
