@@ -1,8 +1,13 @@
 name: CoinsAPI
 version: '${project.version}'
-main: de.lauxmedia.avium.coinsapi.CoinsAPI
+main: de.lauxmedia.avium.coins.Coins
 api-version: 1.16
 load: STARTUP
 authors: [ jonax ]
 description: CoinAPI for server networks.
 website: lauxmedia.de
+
+commands:
+  coins:
+    description: Coins Command
+    usage: §c/coins
